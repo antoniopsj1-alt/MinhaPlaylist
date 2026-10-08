@@ -249,6 +249,7 @@ h1,h2,h3,.font-b{font-family:'Baloo 2',cursive}
     <div class="subhead"><div class="cov" id="bandCov"><span>🎵</span></div>
       <div><b id="bandName">—</b><br><small id="bandCount">0 itens</small></div></div>
     <button class="addfilebtn" id="btnAddFiles">＋ Adicionar arquivos</button>
+    <button class="addfilebtn" id="btnAddFolder">📁 Adicionar pasta (com subpastas)</button>
     <ul class="tracklist" id="bandTracks"></ul>
     <div id="builderSlotBand"></div>
   </div>
@@ -467,7 +468,9 @@ bands = [
 
 /* ===== PERSISTÊNCIA: edições gravadas no código-fonte (name, type, cover, tracks[name,url]) ===== */
 const SESS={}, U=u=>SESS[u]||u, LSK='minhaplaylist-edicoes';
-const pick=f=>{SESS[f.name]=URL.createObjectURL(f);return f.name;};
+const pick=f=>{const pt=(f.webkitRelativePath||f.name).split('/'),dir=decodeURIComponent(location.pathname).split('/').slice(-2,-1)[0];
+  if(pt.length>1&&pt[0]===dir)pt.shift(); // se escolheu a própria pasta do HTML, não repete o nome dela
+  const r=pt.join('/');SESS[r]=URL.createObjectURL(f);return r;};
 const norm=a=>JSON.stringify(a.map(b=>[b.name,b.type,b.cover||null,b.tracks.map(t=>[t.name,t.url])]));
 const SITE=!!$('btnDownload'); // no site (versão com botão Baixar) as edições não são gravadas
 const BASE=norm(bands); let pendente=false;
@@ -527,16 +530,17 @@ function bandFormHTML(type){
     <label>Tipo</label><select id="fType"><option value="mp3">🎵 Músicas (mp3)</option><option value="mp4">🎬 Videoclipes (mp4)</option></select>
     <label>Foto da banda (opcional)</label>
     <label class="filepick" for="fCover">🖼️ <span id="fCoverName">Escolher uma foto</span><input type="file" id="fCover" accept="image/*"></label>
+    <label>Endereço da foto (a partir da pasta do MinhaPlaylist.html)</label><input type="text" id="fCoverUrl" placeholder="Ex: Fotos/banda.png">
     <button class="save" id="fSave">Criar banda</button>`;
 }
 function openNewBand(type){
   openModal(bandFormHTML(type));
   $('fType').value=type;
   let coverData=null;
-  $('fCover').onchange=async e=>{ if(e.target.files[0]){ coverData=pick(e.target.files[0]); $('fCoverName').textContent=e.target.files[0].name; } };
+  $('fCover').onchange=async e=>{ if(e.target.files[0]){ coverData=pick(e.target.files[0]); $('fCoverName').textContent=e.target.files[0].name; $('fCoverUrl').value=coverData; } };
   $('fSave').onclick=()=>{
     const name=$('fName').value.trim(); if(!name){ toast('Dá um nome pra banda! 🎀'); return; }
-    bands.push({id:++uid,name,type:$('fType').value,cover:coverData,tracks:[]});
+    bands.push({id:++uid,name,type:$('fType').value,cover:$('fCoverUrl').value.trim()||coverData,tracks:[]});
     commit(); closeModal(); renderHome();
   };
 }
@@ -546,11 +550,12 @@ function editBand(id){
   openModal(bandFormHTML(b.type).replace('Nova banda','Editar banda').replace('Criar banda','Salvar alterações'));
   $('fName').value=b.name; $('fType').value=b.type;
   let coverData=b.cover;
+  $('fCoverUrl').value=b.cover&&!String(b.cover).startsWith('data:')?b.cover:'';
   if(b.cover) $('fCoverName').textContent='Foto atual (toque para trocar)';
-  $('fCover').onchange=async e=>{ if(e.target.files[0]){ coverData=pick(e.target.files[0]); $('fCoverName').textContent=e.target.files[0].name; } };
+  $('fCover').onchange=async e=>{ if(e.target.files[0]){ coverData=pick(e.target.files[0]); $('fCoverName').textContent=e.target.files[0].name; $('fCoverUrl').value=coverData; } };
   $('fSave').onclick=()=>{
     const name=$('fName').value.trim(); if(!name){ toast('Dá um nome pra banda! 🎀'); return; }
-    b.name=name; b.type=$('fType').value; b.cover=coverData;
+    b.name=name; b.type=$('fType').value; const cu=$('fCoverUrl').value.trim(); b.cover=cu||(String(b.cover).startsWith('data:')?b.cover:null);
     commit(); closeModal(); renderHome();
   };
 }
@@ -600,7 +605,7 @@ $('btnDownload').onclick=async()=>{
 $('btnTutorial').onclick=()=>openModal(tutorialHTML());
 function tutorialHTML(){return `<h3>📖 Instalar no celular</h3><ol class="tut">
 <li><b>Baixe os 2 arquivos:</b> toque em “Baixar MinhaPlaylist.html”. Vão para a pasta Download: <code>MinhaPlaylist.html</code> e <code>sw.js</code>. Se o celular perguntar, permita baixar vários arquivos.</li>
-<li><b>Crie a pasta Playlist:</b> no app Arquivos, dentro de Download (ou Documentos), crie a pasta <code>Playlist</code> e mova os 2 arquivos para dentro dela. Coloque ali também suas músicas (.mp3), videoclipes (.mp4) e fotos (.png).</li>
+<li><b>Crie a pasta Playlist:</b> no app Arquivos, dentro de Download (ou Documentos), crie a pasta <code>Playlist</code> e mova os 2 arquivos para dentro dela. Coloque ali também suas músicas (.mp3), videoclipes (.mp4) e fotos (.png). Pode organizar em subpastas dentro de Playlist (ex.: Musicas/Banda): o app grava o endereço a partir da pasta do MinhaPlaylist.html.</li>
 <li><b>Instale o Simple HTTP Server</b> (Play Store, gratuito).</li>
 <li><b>Configure:</b> abra o app, adicione a pasta <code>Playlist</code> como pasta compartilhada e permita o acesso aos arquivos. Em <b>Rede</b>, escolha todas as redes (não só Wi-Fi) e toque em <b>Reiniciar</b>.</li>
 <li><b>Abra no Chrome:</b> <code>http://localhost:8080/MinhaPlaylist.html</code>. Espere aparecer “Tudo salvo!”: depois disso ele abre mesmo sem internet e sem o servidor.</li>
@@ -629,6 +634,19 @@ $('btnAddFiles').onclick=()=>{
   inp.onchange=()=>{
     [...inp.files].forEach(f=>b.tracks.push({id:++uid,name:f.name.replace(/\.[^/.]+$/,''),url:pick(f)}));
     commit();
+    $('bandCount').textContent=b.tracks.length+(b.type==='mp3'?' música(s)':' vídeo(s)');
+    renderBandTracks();
+  };
+  inp.click();
+};
+$('btnAddFolder').onclick=()=>{
+  const b=bands.find(x=>x.id===curBandId),ext=b.type==='mp3'?/\.mp3$/i:/\.mp4$/i;
+  const inp=document.createElement('input'); inp.type='file'; inp.multiple=true; inp.webkitdirectory=true;
+  inp.onchange=()=>{
+    const fs=[...inp.files].filter(f=>ext.test(f.name)).sort((x,y)=>(x.webkitRelativePath||x.name).localeCompare(y.webkitRelativePath||y.name,'pt',{numeric:true}));
+    if(!fs.length){ toast('Nenhum arquivo .'+b.type+' nessa pasta.'); return; }
+    fs.forEach(f=>b.tracks.push({id:++uid,name:f.name.replace(/\.[^/.]+$/,''),url:pick(f)}));
+    commit(); toast('📁 '+fs.length+' arquivo(s). Ex.: '+b.tracks[b.tracks.length-1].url);
     $('bandCount').textContent=b.tracks.length+(b.type==='mp3'?' música(s)':' vídeo(s)');
     renderBandTracks();
   };
@@ -704,7 +722,8 @@ function editTrack(bandId,trackId,listId,slotId,type,getItems){
   const b=bands.find(x=>x.id===bandId); const t=b?.tracks.find(x=>x.id===trackId); if(!t) return;
   const q=v=>String(v).replace(/"/g,'&quot;');
   openModal(`<h3>✏️ Editar faixa</h3><label>Nome</label><input type="text" id="fTrackName" value="${q(t.name)}">
-    <label>Endereço do arquivo</label><input type="text" id="fTrackUrl" value="${q(t.url)}">
+    <label>Endereço do arquivo (a partir da pasta do MinhaPlaylist.html)</label><input type="text" id="fTrackUrl" value="${q(t.url)}">
+    <small style="color:var(--muted)">Ex.: Musicas/Banda/faixa.mp3. O navegador só informa o <b>nome</b> do arquivo escolhido; se ele estiver numa subpasta, complete o endereço aqui.</small>
     <label class="filepick" for="fTrackFile">📂 <span id="fTrackFileName">Escolher outro arquivo</span><input type="file" id="fTrackFile" accept="${b.type==='mp3'?'audio/*,.mp3':'video/*,.mp4'}"></label>
     <button class="save" id="fTrackSave">Salvar</button>`);
   $('fTrackFile').onchange=e=>{const f=e.target.files[0]; if(f){ $('fTrackUrl').value=pick(f); $('fTrackFileName').textContent=f.name; }};
