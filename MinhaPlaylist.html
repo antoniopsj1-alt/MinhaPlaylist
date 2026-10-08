@@ -47,8 +47,13 @@ h1,h2,h3,.font-b{font-family:'Baloo 2',cursive}
 #splash p{opacity:.9;margin:0 0 26px}
 #splash button{background:#fff;color:var(--pink-d);border:none;border-radius:999px;padding:15px 34px;font-family:'Baloo 2';
   font-size:1.05rem;font-weight:700;box-shadow:0 6px 0 rgba(0,0,0,.15);cursor:pointer}
-#splash #btnDownload{margin-top:16px;background:transparent;color:#fff;border:2px solid #fff;box-shadow:none;padding:11px 26px;font-size:.95rem}
-#splash #btnDownload:active{background:rgba(255,255,255,.2)}
+/*DL-START*/
+#splash #btnDownload,#splash #btnTutorial{margin-top:14px;background:transparent;color:#fff;border:2px solid #fff;box-shadow:none;padding:11px 26px;font-size:.95rem}
+/*DL-END*/
+.modal{max-height:88vh;overflow-y:auto}.tut{padding-left:20px;text-align:left}.tut li{margin:8px 0;font-size:.92rem}
+#svBar{position:fixed;left:10px;right:10px;bottom:64px;background:#222;color:#fff;border-radius:16px;padding:10px 12px;display:none;gap:8px;align-items:center;z-index:50;font:600 13px 'Quicksand',sans-serif}
+#svBar.on{display:flex}#svBar span{flex:1}
+#svBar button{background:#fff;color:var(--pink-d);border:0;border-radius:999px;padding:9px 14px;font:700 13px 'Quicksand',sans-serif;cursor:pointer}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
 
 /* home */
@@ -192,7 +197,10 @@ h1,h2,h3,.font-b{font-family:'Baloo 2',cursive}
   <h1>Minha Playlist - Offline</h1>
   <h3>Músicas (.mp3) e videoclipes (.mp4) das suas bandas favoritas</h3>
   <button id="btnEnter">Vamos começar! ✨</button>
+  <!--DL-START-->
   <button id="btnDownload">⬇️ Baixar MinhaPlaylist.html</button>
+  <button id="btnTutorial">📖 Como instalar no celular</button>
+  <!--DL-END-->
   		<footer style="text-align: center; color: white; font-size: 18px;"> <!-- Início do Rodapé da página -->
                   <p style="text-align: center;">
                   <a href="https://antoniopsj1-alt.github.io/Portfolio-AntonioJunior/" target="_blank" style="text-decoration: none; color: inherit;">
@@ -322,6 +330,7 @@ let uid=0;
    verdade quando quiser, do jeito que preferir usar o app.
 ===================================================================== */
 
+/*DATA-START*/
 bands = [
   /* ARQUIVOS DAS MÚSICAS PASTA: "MUSICAS/.mp3" */
   {
@@ -454,6 +463,35 @@ bands = [
         ]
       } 
 ];
+/*DATA-END*/
+
+/* ===== PERSISTÊNCIA: edições gravadas no código-fonte (name, type, cover, tracks[name,url]) ===== */
+const SESS={}, U=u=>SESS[u]||u, LSK='minhaplaylist-edicoes';
+const pick=f=>{SESS[f.name]=URL.createObjectURL(f);return f.name;};
+const norm=a=>JSON.stringify(a.map(b=>[b.name,b.type,b.cover||null,b.tracks.map(t=>[t.name,t.url])]));
+const BASE=norm(bands); let pendente=false;
+try{const sv=JSON.parse(localStorage.getItem(LSK)||'null');
+  if(sv&&sv.base===BASE&&Array.isArray(sv.data)){bands=sv.data;pendente=true;uid=Math.max(uid,...bands.flatMap(b=>[b.id,...b.tracks.map(t=>t.id)]));}
+  else if(sv)localStorage.removeItem(LSK);}catch(e){}
+const esc=x=>JSON.stringify(x).replace(/</g,'\\u003c');
+function serialize(){return 'bands = [\n'+bands.map(b=>'  {\n    id: ++uid,\n    name: '+esc(b.name)+',\n    type: '+esc(b.type)+',\n    cover: '+esc(b.cover||null)+',\n    tracks: [\n'+b.tracks.map(t=>'      { id: ++uid, name: '+esc(t.name)+', url: '+esc(t.url)+' }').join(',\n')+'\n    ]\n  }').join(',\n')+'\n];';}
+async function fonte(){try{const r=await fetch(location.href.split('#')[0].split('?')[0],{cache:'no-store'});if(!r.ok)throw 0;return (await r.text()).replace(/<!-- Code injected by live-server -->[\s\S]*?<\/script>/i,'');}catch(e){return ORIG;}}
+const comDados=t=>t.replace(/\/\*DATA-START\*\/[\s\S]*?\/\*DATA-END\*\//,()=>'/*DATA-START*/\n'+serialize()+'\n/*DATA-END*/');
+function baixar(blob,nome){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nome;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);}
+let fh=null;
+async function gravar(){
+  if(window.showSaveFilePicker&&!fh)fh=await showSaveFilePicker({suggestedName:'MinhaPlaylist.html',types:[{description:'Página HTML',accept:{'text/html':['.html']}}]});
+  const novo=comDados(await fonte());
+  if(fh){const w=await fh.createWritable();await w.write(novo);await w.close();toast('✅ Gravado no arquivo');}
+  else{baixar(new Blob([novo],{type:'text/html;charset=utf-8'}),'MinhaPlaylist.html');
+    openModal('<h3>✅ Arquivo atualizado baixado</h3><p>Para gravar de vez: no app <b>Arquivos</b>, ache o <b>MinhaPlaylist.html</b> que acabou de baixar (em Download) e mova para a pasta <b>Playlist</b>, substituindo o antigo.</p><button class="save" onclick="closeModal()">Entendi! 💗</button>');}
+  barra(false);}
+const sv=document.createElement('div');sv.id='svBar';sv.innerHTML='<span>📝 Edições salvas neste aparelho</span><button id="svBtn">💾 Gravar no arquivo</button>';document.body.appendChild(sv);
+const barra=on=>sv.classList.toggle('on',on);
+$('svBtn').onclick=()=>gravar().catch(e=>{if(!e||e.name!=='AbortError')toast('Não foi possível gravar.');});
+if(pendente)barra(true);
+function commit(){try{localStorage.setItem(LSK,JSON.stringify({base:BASE,data:bands}));}catch(e){}
+  if(fh)gravar().catch(()=>barra(true));else barra(true);}
 
 /* ===================== FIM DOS DADOS DE EXEMPLO ===================== */
 let curBandId=null, curPool=null; // 'mp3'|'mp4'
@@ -485,32 +523,34 @@ function fileToDataURL(file){return new Promise(res=>{const r=new FileReader();r
 function bandFormHTML(type){
   return `<h3>${type==='mp3'?'🎤 Nova banda · Músicas':'🎬 Nova banda · Videoclipes'}</h3>
     <label>Nome da banda</label><input type="text" id="fName" placeholder="Ex: As Estrelinhas">
+    <label>Tipo</label><select id="fType"><option value="mp3">🎵 Músicas (mp3)</option><option value="mp4">🎬 Videoclipes (mp4)</option></select>
     <label>Foto da banda (opcional)</label>
     <label class="filepick" for="fCover">🖼️ <span id="fCoverName">Escolher uma foto</span><input type="file" id="fCover" accept="image/*"></label>
     <button class="save" id="fSave">Criar banda</button>`;
 }
 function openNewBand(type){
   openModal(bandFormHTML(type));
+  $('fType').value=type;
   let coverData=null;
-  $('fCover').onchange=async e=>{ if(e.target.files[0]){ coverData=await fileToDataURL(e.target.files[0]); $('fCoverName').textContent=e.target.files[0].name; } };
+  $('fCover').onchange=async e=>{ if(e.target.files[0]){ coverData=pick(e.target.files[0]); $('fCoverName').textContent=e.target.files[0].name; } };
   $('fSave').onclick=()=>{
     const name=$('fName').value.trim(); if(!name){ toast('Dá um nome pra banda! 🎀'); return; }
-    bands.push({id:++uid,name,type,cover:coverData,tracks:[]});
-    closeModal(); renderHome();
+    bands.push({id:++uid,name,type:$('fType').value,cover:coverData,tracks:[]});
+    commit(); closeModal(); renderHome();
   };
 }
 
 function editBand(id){
   const b=bands.find(x=>x.id===id); if(!b) return;
   openModal(bandFormHTML(b.type).replace('Nova banda','Editar banda').replace('Criar banda','Salvar alterações'));
-  $('fName').value=b.name;
+  $('fName').value=b.name; $('fType').value=b.type;
   let coverData=b.cover;
   if(b.cover) $('fCoverName').textContent='Foto atual (toque para trocar)';
-  $('fCover').onchange=async e=>{ if(e.target.files[0]){ coverData=await fileToDataURL(e.target.files[0]); $('fCoverName').textContent=e.target.files[0].name; } };
+  $('fCover').onchange=async e=>{ if(e.target.files[0]){ coverData=pick(e.target.files[0]); $('fCoverName').textContent=e.target.files[0].name; } };
   $('fSave').onclick=()=>{
     const name=$('fName').value.trim(); if(!name){ toast('Dá um nome pra banda! 🎀'); return; }
-    b.name=name; b.cover=coverData;
-    closeModal(); renderHome();
+    b.name=name; b.type=$('fType').value; b.cover=coverData;
+    commit(); closeModal(); renderHome();
   };
 }
 
@@ -519,11 +559,11 @@ function deleteBand(id){
   if(!confirm(`Excluir a banda "${b.name}" e todas as suas faixas?`)) return;
   bands=bands.filter(x=>x.id!==id);
   selection=selection.filter(t=>t.bandId!==id);
-  renderHome();
+  commit(); renderHome();
 }
 
 function bandTile(b){
-  const cov = b.cover?`<img src="${b.cover}">`:`<div class="fall">${b.type==='mp3'?'🎤':'🎬'}</div>`;
+  const cov = b.cover?`<img src="${U(b.cover)}">`:`<div class="fall">${b.type==='mp3'?'🎤':'🎬'}</div>`;
   return `<div class="band" data-id="${b.id}" role="button" tabindex="0">${cov}<span class="badge">${b.type==='mp3'?'🎵':'🎬'}</span>
     <span class="bandtools"><button type="button" data-edit="${b.id}" aria-label="Editar banda">✏️</button><button type="button" class="del" data-del="${b.id}" aria-label="Excluir banda">🗑️</button></span>
     <span class="nm">${b.name}</span></div>`;
@@ -543,18 +583,30 @@ function renderHome(){
   document.querySelectorAll('.band [data-del]').forEach(btn=>btn.onclick=e=>{ e.stopPropagation(); deleteBand(parseInt(btn.dataset.del)); });
 }
 $('btnEnter').onclick=()=>{ show('homeView'); renderHome(); };
+/*DL-START*/
+const quitaDL=t=>t.replace(/(\/\*|<!--)DL-START(\*\/|-->)[\s\S]*?(\/\*|<!--)DL-END(\*\/|-->)\s*/g,'');
 $('btnDownload').onclick=async()=>{
-  let txt;
-  try{ const r=await fetch(location.href.split('#')[0],{cache:'no-store'}); if(!r.ok) throw 0;
-    txt=(await r.text()).replace(/<!-- Code injected by live-server -->[\s\S]*?<\/script>/i,''); }
-  catch(e){ txt=ORIG; }
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([txt],{type:'text/html;charset=utf-8'}));
-  a.download='MinhaPlaylist.html';
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
-  toast('Baixando MinhaPlaylist.html…');
+  try{
+    const r=await fetch('sw.js',{cache:'no-store'}); if(!r.ok) throw 0;
+    const sw=await r.text();
+    const html=quitaDL(comDados(await fonte()));
+    baixar(new Blob([html],{type:'text/html;charset=utf-8'}),'MinhaPlaylist.html');
+    await new Promise(ok=>setTimeout(ok,700));
+    baixar(new Blob([sw],{type:'text/javascript;charset=utf-8'}),'sw.js');
+    openModal(tutorialHTML());
+  }catch(e){ toast('Não consegui baixar. Abra pelo endereço do site e tente de novo.'); }
 };
+$('btnTutorial').onclick=()=>openModal(tutorialHTML());
+function tutorialHTML(){return `<h3>📖 Instalar no celular</h3><ol class="tut">
+<li><b>Baixe os 2 arquivos:</b> toque em “Baixar MinhaPlaylist.html”. Vão para a pasta Download: <code>MinhaPlaylist.html</code> e <code>sw.js</code>. Se o celular perguntar, permita baixar vários arquivos.</li>
+<li><b>Crie a pasta Playlist:</b> no app Arquivos, dentro de Download (ou Documentos), crie a pasta <code>Playlist</code> e mova os 2 arquivos para dentro dela. Coloque ali também suas músicas (.mp3), videoclipes (.mp4) e fotos (.png).</li>
+<li><b>Instale o Simple HTTP Server</b> (Play Store, gratuito).</li>
+<li><b>Configure:</b> abra o app, adicione a pasta <code>Playlist</code> como pasta compartilhada e permita o acesso aos arquivos. Em <b>Rede</b>, escolha todas as redes (não só Wi-Fi) e toque em <b>Reiniciar</b>.</li>
+<li><b>Abra no Chrome:</b> <code>http://localhost:8080/MinhaPlaylist.html</code>. Espere aparecer “Tudo salvo!”: depois disso ele abre mesmo sem internet e sem o servidor.</li>
+<li><b>Crie o atalho:</b> no Chrome, toque em ⋮ e em “Adicionar à tela inicial”.</li>
+<li><b>Para editar:</b> bandas e faixas editadas ficam salvas no aparelho. Toque em “Gravar no arquivo” para baixar o MinhaPlaylist.html atualizado e troque o antigo na pasta Playlist.</li></ol>
+<button class="save" onclick="closeModal()">Entendi! 💗</button>`;}
+/*DL-END*/
 $('btnAllMp3').onclick=()=>openPool('mp3');
 $('btnAllMp4').onclick=()=>openPool('mp4');
 
@@ -562,7 +614,7 @@ $('btnAllMp4').onclick=()=>openPool('mp4');
 function openBand(id){
   curBandId=id; const b=bands.find(x=>x.id===id);
   $('bandTitle').textContent=b.name; $('bandName').textContent=b.name;
-  $('bandCov').innerHTML=b.cover?`<img src="${b.cover}">`:`<span>${b.type==='mp3'?'🎤':'🎬'}</span>`;
+  $('bandCov').innerHTML=b.cover?`<img src="${U(b.cover)}">`:`<span>${b.type==='mp3'?'🎤':'🎬'}</span>`;
   $('bandCount').textContent=b.tracks.length+(b.type==='mp3'?' música(s)':' vídeo(s)');
   selection=[];
   renderBandTracks(); renderBuilder('builderSlotBand', b.type, ()=>b.tracks.map(t=>({...t,type:b.type,bandName:b.name})));
@@ -574,7 +626,8 @@ $('btnAddFiles').onclick=()=>{
   const inp=document.createElement('input'); inp.type='file'; inp.multiple=true;
   inp.accept=b.type==='mp3'?'audio/*,.mp3':'video/*,.mp4';
   inp.onchange=()=>{
-    [...inp.files].forEach(f=>b.tracks.push({id:++uid,name:f.name.replace(/\.[^/.]+$/,''),url:URL.createObjectURL(f)}));
+    [...inp.files].forEach(f=>b.tracks.push({id:++uid,name:f.name.replace(/\.[^/.]+$/,''),url:pick(f)}));
+    commit();
     $('bandCount').textContent=b.tracks.length+(b.type==='mp3'?' música(s)':' vídeo(s)');
     renderBandTracks();
   };
@@ -648,11 +701,17 @@ function wireRows(listId,slotId,type,getItems){
 }
 function editTrack(bandId,trackId,listId,slotId,type,getItems){
   const b=bands.find(x=>x.id===bandId); const t=b?.tracks.find(x=>x.id===trackId); if(!t) return;
-  openModal(`<h3>✏️ Renomear faixa</h3><label>Nome</label><input type="text" id="fTrackName" value="${t.name.replace(/"/g,'&quot;')}">
+  const q=v=>String(v).replace(/"/g,'&quot;');
+  openModal(`<h3>✏️ Editar faixa</h3><label>Nome</label><input type="text" id="fTrackName" value="${q(t.name)}">
+    <label>Endereço do arquivo</label><input type="text" id="fTrackUrl" value="${q(t.url)}">
+    <label class="filepick" for="fTrackFile">📂 <span id="fTrackFileName">Escolher outro arquivo</span><input type="file" id="fTrackFile" accept="${b.type==='mp3'?'audio/*,.mp3':'video/*,.mp4'}"></label>
     <button class="save" id="fTrackSave">Salvar</button>`);
+  $('fTrackFile').onchange=e=>{const f=e.target.files[0]; if(f){ $('fTrackUrl').value=pick(f); $('fTrackFileName').textContent=f.name; }};
   $('fTrackSave').onclick=()=>{
-    const name=$('fTrackName').value.trim(); if(!name){ toast('Dá um nome pra faixa! 🎶'); return; }
-    t.name=name; closeModal();
+    const name=$('fTrackName').value.trim(), url=$('fTrackUrl').value.trim();
+    if(!name){ toast('Dá um nome pra faixa! 🎶'); return; }
+    if(!url){ toast('Informe o endereço do arquivo 📂'); return; }
+    t.name=name; t.url=url; commit(); closeModal();
     if(listId==='bandTracks') renderBandTracks(); else renderPoolTracks(type);
   };
 }
@@ -662,6 +721,7 @@ function deleteTrack(bandId,trackId,listId,slotId,type,getItems){
   if(!confirm(`Excluir "${t.name}"?`)) return;
   b.tracks=b.tracks.filter(x=>x.id!==trackId);
   selection=selection.filter(x=>x.id!==trackId);
+  commit();
   if(listId==='bandTracks') renderBandTracks(); else renderPoolTracks(type);
 }
 function refreshSelectionUI(listId,slotId,type,getItems){
@@ -740,7 +800,7 @@ function loadTrack(i){
   if(i<0||i>=playlist.length) return;
   pauseCur(); curIdx=i; const t=playlist[i];
   $('pTitle').textContent=t.name; $('pSub').textContent=t.bandName||'';
-  const el=curEl(); el.src=t.url; el.volume=$('volSlider').value/100; el.play().catch(()=>{});
+  const el=curEl(); el.src=U(t.url); el.volume=$('volSlider').value/100; el.play().catch(()=>{});
   $('btnPlay').textContent='⏸';
   renderPlList();
 }
