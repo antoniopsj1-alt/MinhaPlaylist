@@ -469,13 +469,14 @@ bands = [
 const SESS={}, U=u=>SESS[u]||u, LSK='minhaplaylist-edicoes';
 const pick=f=>{SESS[f.name]=URL.createObjectURL(f);return f.name;};
 const norm=a=>JSON.stringify(a.map(b=>[b.name,b.type,b.cover||null,b.tracks.map(t=>[t.name,t.url])]));
+const SITE=!!$('btnDownload'); // no site (versão com botão Baixar) as edições não são gravadas
 const BASE=norm(bands); let pendente=false;
-try{const sv=JSON.parse(localStorage.getItem(LSK)||'null');
+try{const sv=SITE?null:JSON.parse(localStorage.getItem(LSK)||'null');
   if(sv&&sv.base===BASE&&Array.isArray(sv.data)){bands=sv.data;pendente=true;uid=Math.max(uid,...bands.flatMap(b=>[b.id,...b.tracks.map(t=>t.id)]));}
   else if(sv)localStorage.removeItem(LSK);}catch(e){}
 const esc=x=>JSON.stringify(x).replace(/</g,'\\u003c');
 function serialize(){return 'bands = [\n'+bands.map(b=>'  {\n    id: ++uid,\n    name: '+esc(b.name)+',\n    type: '+esc(b.type)+',\n    cover: '+esc(b.cover||null)+',\n    tracks: [\n'+b.tracks.map(t=>'      { id: ++uid, name: '+esc(t.name)+', url: '+esc(t.url)+' }').join(',\n')+'\n    ]\n  }').join(',\n')+'\n];';}
-async function fonte(){try{const r=await fetch(location.href.split('#')[0].split('?')[0],{cache:'no-store'});if(!r.ok)throw 0;return (await r.text()).replace(/<!-- Code injected by live-server -->[\s\S]*?<\/script>/i,'');}catch(e){return ORIG;}}
+async function fonte(){try{const r=await fetch(location.href.split('#')[0].split('?')[0],{cache:'no-store'});if(!r.ok)throw 0;return (await r.text()).replace(new RegExp('<!-- Code injected by '+'live-server -->[\\s\\S]*?<\\/scr'+'ipt>','i'),'');}catch(e){return ORIG;}}
 const comDados=t=>t.replace(/\/\*DATA-START\*\/[\s\S]*?\/\*DATA-END\*\//,()=>'/*DATA-START*/\n'+serialize()+'\n/*DATA-END*/');
 function baixar(blob,nome){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nome;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);}
 let fh=null;
@@ -490,7 +491,7 @@ const sv=document.createElement('div');sv.id='svBar';sv.innerHTML='<span>📝 Ed
 const barra=on=>sv.classList.toggle('on',on);
 $('svBtn').onclick=()=>gravar().catch(e=>{if(!e||e.name!=='AbortError')toast('Não foi possível gravar.');});
 if(pendente)barra(true);
-function commit(){try{localStorage.setItem(LSK,JSON.stringify({base:BASE,data:bands}));}catch(e){}
+function commit(){if(SITE)return;try{localStorage.setItem(LSK,JSON.stringify({base:BASE,data:bands}));}catch(e){}
   if(fh)gravar().catch(()=>barra(true));else barra(true);}
 
 /* ===================== FIM DOS DADOS DE EXEMPLO ===================== */
@@ -589,7 +590,7 @@ $('btnDownload').onclick=async()=>{
   try{
     const r=await fetch('sw.js',{cache:'no-store'}); if(!r.ok) throw 0;
     const sw=await r.text();
-    const html=quitaDL(comDados(await fonte()));
+    const html=quitaDL(await fonte());
     baixar(new Blob([html],{type:'text/html;charset=utf-8'}),'MinhaPlaylist.html');
     await new Promise(ok=>setTimeout(ok,700));
     baixar(new Blob([sw],{type:'text/javascript;charset=utf-8'}),'sw.js');
