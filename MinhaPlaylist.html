@@ -530,14 +530,28 @@ function bandFormHTML(type){
     <label>Tipo</label><select id="fType"><option value="mp3">🎵 Músicas (mp3)</option><option value="mp4">🎬 Videoclipes (mp4)</option></select>
     <label>Foto da banda (opcional)</label>
     <label class="filepick" for="fCover">🖼️ <span id="fCoverName">Escolher uma foto</span><input type="file" id="fCover" accept="image/*"></label>
+    <button type="button" class="addfilebtn" id="fCoverFolder">📁 Escolher foto numa pasta (grava a subpasta)</button><div id="fCoverList"></div>
     <label>Endereço da foto (a partir da pasta do MinhaPlaylist.html)</label><input type="text" id="fCoverUrl" placeholder="Ex: Fotos/banda.png">
     <button class="save" id="fSave">Criar banda</button>`;
+}
+function wireCoverFolder(){
+  $('fCoverFolder').onclick=()=>{
+    const inp=document.createElement('input'); inp.type='file'; inp.multiple=true; inp.webkitdirectory=true;
+    inp.onchange=()=>{
+      const im=[...inp.files].filter(f=>/\.(png|jpe?g|webp|gif)$/i.test(f.name)).sort((x,y)=>(x.webkitRelativePath||x.name).localeCompare(y.webkitRelativePath||y.name,'pt',{numeric:true}));
+      if(!im.length){ toast('Nenhuma imagem nessa pasta.'); return; }
+      const L=$('fCoverList'); L.innerHTML='';
+      im.slice(0,80).forEach(f=>{ const r=pick(f), bt=document.createElement('button'); bt.type='button'; bt.className='addfilebtn'; bt.textContent='🖼️ '+r;
+        bt.onclick=()=>{ $('fCoverUrl').value=r; $('fCoverName').textContent=f.name; L.innerHTML=''; }; L.appendChild(bt); });
+    };
+    inp.click();
+  };
 }
 function openNewBand(type){
   openModal(bandFormHTML(type));
   $('fType').value=type;
   let coverData=null;
-  $('fCover').onchange=async e=>{ if(e.target.files[0]){ coverData=pick(e.target.files[0]); $('fCoverName').textContent=e.target.files[0].name; $('fCoverUrl').value=coverData; } };
+  $('fCover').onchange=async e=>{ if(e.target.files[0]){ coverData=pick(e.target.files[0]); $('fCoverName').textContent=e.target.files[0].name; $('fCoverUrl').value=coverData; } }; wireCoverFolder();
   $('fSave').onclick=()=>{
     const name=$('fName').value.trim(); if(!name){ toast('Dá um nome pra banda! 🎀'); return; }
     bands.push({id:++uid,name,type:$('fType').value,cover:$('fCoverUrl').value.trim()||coverData,tracks:[]});
@@ -552,7 +566,7 @@ function editBand(id){
   let coverData=b.cover;
   $('fCoverUrl').value=b.cover&&!String(b.cover).startsWith('data:')?b.cover:'';
   if(b.cover) $('fCoverName').textContent='Foto atual (toque para trocar)';
-  $('fCover').onchange=async e=>{ if(e.target.files[0]){ coverData=pick(e.target.files[0]); $('fCoverName').textContent=e.target.files[0].name; $('fCoverUrl').value=coverData; } };
+  $('fCover').onchange=async e=>{ if(e.target.files[0]){ coverData=pick(e.target.files[0]); $('fCoverName').textContent=e.target.files[0].name; $('fCoverUrl').value=coverData; } }; wireCoverFolder();
   $('fSave').onclick=()=>{
     const name=$('fName').value.trim(); if(!name){ toast('Dá um nome pra banda! 🎀'); return; }
     b.name=name; b.type=$('fType').value; const cu=$('fCoverUrl').value.trim(); b.cover=cu||(String(b.cover).startsWith('data:')?b.cover:null);
