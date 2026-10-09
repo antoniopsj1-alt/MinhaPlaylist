@@ -51,9 +51,6 @@ h1,h2,h3,.font-b{font-family:'Baloo 2',cursive}
 #splash #btnDownload,#splash #btnTutorial{margin-top:14px;background:transparent;color:#fff;border:2px solid #fff;box-shadow:none;padding:11px 26px;font-size:.95rem}
 /*DL-END*/
 .modal{max-height:88vh;overflow-y:auto}.tut{padding-left:20px;text-align:left}.tut li{margin:8px 0;font-size:.92rem}
-#svBar{position:fixed;left:10px;right:10px;bottom:64px;background:#222;color:#fff;border-radius:16px;padding:10px 12px;display:none;gap:8px;align-items:center;z-index:50;font:600 13px 'Quicksand',sans-serif}
-#svBar.on{display:flex}#svBar span{flex:1}
-#svBar button{background:#fff;color:var(--pink-d);border:0;border-radius:999px;padding:9px 14px;font:700 13px 'Quicksand',sans-serif;cursor:pointer}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
 
 /* home */
@@ -218,7 +215,7 @@ h1,h2,h3,.font-b{font-family:'Baloo 2',cursive}
 
 
 <div id="homeView" class="view">
-  <div class="topbar"><span style="width:42px"></span><h2>🎵 Minha Playlist - Offline</h2>
+  <div class="topbar"><button class="tbtn" id="btnSaveFile" title="Gravar no arquivo">💾</button><h2>🎵 Minha Playlist - Offline</h2>
     <button class="tbtn" id="btnHelpHome">❓</button><button class="tbtn" id="btnCloseHome">✕</button></div>
   <div class="wrap">
     <div class="hero">
@@ -473,9 +470,9 @@ const pick=f=>{const pt=(f.webkitRelativePath||f.name).split('/'),dir=decodeURIC
   const r=pt.join('/');SESS[r]=URL.createObjectURL(f);return r;};
 const norm=a=>JSON.stringify(a.map(b=>[b.name,b.type,b.cover||null,b.tracks.map(t=>[t.name,t.url])]));
 const SITE=!!$('btnDownload'); // no site (versão com botão Baixar) as edições não são gravadas
-const BASE=norm(bands); let pendente=false;
+const BASE=norm(bands); 
 try{const sv=SITE?null:JSON.parse(localStorage.getItem(LSK)||'null');
-  if(sv&&sv.base===BASE&&Array.isArray(sv.data)){bands=sv.data;pendente=true;uid=Math.max(uid,...bands.flatMap(b=>[b.id,...b.tracks.map(t=>t.id)]));}
+  if(sv&&sv.base===BASE&&Array.isArray(sv.data)){bands=sv.data;uid=Math.max(uid,...bands.flatMap(b=>[b.id,...b.tracks.map(t=>t.id)]));}
   else if(sv)localStorage.removeItem(LSK);}catch(e){}
 const esc=x=>JSON.stringify(x).replace(/</g,'\\u003c');
 function serialize(){return 'bands = [\n'+bands.map(b=>'  {\n    id: ++uid,\n    name: '+esc(b.name)+',\n    type: '+esc(b.type)+',\n    cover: '+esc(b.cover||null)+',\n    tracks: [\n'+b.tracks.map(t=>'      { id: ++uid, name: '+esc(t.name)+', url: '+esc(t.url)+' }').join(',\n')+'\n    ]\n  }').join(',\n')+'\n];';}
@@ -488,14 +485,12 @@ async function gravar(){
   const novo=comDados(await fonte());
   if(fh){const w=await fh.createWritable();await w.write(novo);await w.close();toast('✅ Gravado no arquivo');}
   else{baixar(new Blob([novo],{type:'text/html;charset=utf-8'}),'MinhaPlaylist.html');
-    openModal('<h3>✅ Arquivo atualizado baixado</h3><p>Para gravar de vez: no app <b>Arquivos</b>, ache o <b>MinhaPlaylist.html</b> que acabou de baixar (em Download) e mova para a pasta <b>Playlist</b>, substituindo o antigo.</p><button class="save" onclick="closeModal()">Entendi! 💗</button>');}
-  barra(false);}
-const sv=document.createElement('div');sv.id='svBar';sv.innerHTML='<span>📝 Edições salvas neste aparelho</span><button id="svBtn">💾 Gravar no arquivo</button>';document.body.appendChild(sv);
-const barra=on=>sv.classList.toggle('on',on);
-$('svBtn').onclick=()=>gravar().catch(e=>{if(!e||e.name!=='AbortError')toast('Não foi possível gravar.');});
-if(pendente)barra(true);
+    openModal('<h3>✅ Arquivo atualizado baixado</h3><p>Para gravar de vez: no app <b>Arquivos</b>, ache o <b>MinhaPlaylist.html</b> que acabou de baixar (em Download) e mova para a pasta <b>Playlist</b>, substituindo o antigo.</p><button class="save" onclick="closeModal()">Entendi! 💗</button>');}}
+$('btnSaveFile').onclick=()=>gravar().catch(e=>{if(!e||e.name!=='AbortError')toast('Não foi possível gravar.');});
+if(SITE)$('btnSaveFile').style.visibility='hidden'; // no site não há o que gravar
 function commit(){if(SITE)return;try{localStorage.setItem(LSK,JSON.stringify({base:BASE,data:bands}));}catch(e){}
-  if(fh)gravar().catch(()=>barra(true));else barra(true);}
+  if(fh)gravar().catch(()=>{fh=null;}); // se já escolheu o arquivo no computador, grava direto nele (sem cópias)
+}
 
 /* ===================== FIM DOS DADOS DE EXEMPLO ===================== */
 let curBandId=null, curPool=null; // 'mp3'|'mp4'
@@ -624,7 +619,7 @@ function tutorialHTML(){return `<h3>📖 Instalar no celular</h3><ol class="tut"
 <li><b>Configure:</b> abra o app, adicione a pasta <code>Playlist</code> como pasta compartilhada e permita o acesso aos arquivos. Em <b>Rede</b>, escolha todas as redes (não só Wi-Fi) e toque em <b>Reiniciar</b>.</li>
 <li><b>Abra no Chrome:</b> <code>http://localhost:8080/MinhaPlaylist.html</code>. Espere aparecer “Tudo salvo!”: depois disso ele abre mesmo sem internet e sem o servidor.</li>
 <li><b>Crie o atalho:</b> no Chrome, toque em ⋮ e em “Adicionar à tela inicial”.</li>
-<li><b>Para editar:</b> bandas e faixas editadas ficam salvas no aparelho. Toque em “Gravar no arquivo” para baixar o MinhaPlaylist.html atualizado e troque o antigo na pasta Playlist.</li></ol>
+<li><b>Para editar:</b> bandas e faixas editadas ficam salvas automaticamente no aparelho. Se quiser levar para outro aparelho ou ter uma cópia no código, toque em 💾 no topo da tela inicial e troque o MinhaPlaylist.html da pasta Playlist pelo baixado.</li></ol>
 <button class="save" onclick="closeModal()">Entendi! 💗</button>`;}
 /*DL-END*/
 $('btnAllMp3').onclick=()=>openPool('mp3');
