@@ -6,6 +6,7 @@
 <meta name="keywords" content="Antônio Pereira de Souza Junior, playlist, música, mp3, mp4, bandas, videoclipes, música brasileira">
 <meta name="author" content="Antônio Pereira de Souza Junior">
 <title>Minha Playlist - ANASTASIA</title>
+<link rel="icon" type="image/png" href="Icone%20de%20Musica.png"><link rel="apple-touch-icon" href="Icone%20de%20Musica.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
@@ -47,9 +48,6 @@ h1,h2,h3,.font-b{font-family:'Baloo 2',cursive}
 #splash p{opacity:.9;margin:0 0 26px}
 #splash button{background:#fff;color:var(--pink-d);border:none;border-radius:999px;padding:15px 34px;font-family:'Baloo 2';
   font-size:1.05rem;font-weight:700;box-shadow:0 6px 0 rgba(0,0,0,.15);cursor:pointer}
-/*DL-START*/
-#splash #btnDownload,#splash #btnTutorial{margin-top:14px;background:transparent;color:#fff;border:2px solid #fff;box-shadow:none;padding:11px 26px;font-size:.95rem}
-/*DL-END*/
 .modal{max-height:88vh;overflow-y:auto}.tut{padding-left:20px;text-align:left}.tut li{margin:8px 0;font-size:.92rem}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
 
@@ -136,7 +134,13 @@ h1,h2,h3,.font-b{font-family:'Baloo 2',cursive}
 /* player */
 #playerView .wrap{padding-bottom:30px}
 .stage{border-radius:26px;overflow:hidden;background:var(--ink);margin-bottom:16px;box-shadow:0 14px 28px -12px rgba(37,99,235,.35)}
+.stage.video-stage{position:relative}
 .stage video{width:100%;display:block;aspect-ratio:16/9;background:#000}
+.video-expand{position:absolute;top:10px;right:10px;width:42px;height:42px;border:0;border-radius:13px;background:rgba(255,255,255,.92);color:var(--ink);font-size:1.35rem;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+.video-expand:active{transform:scale(.95)}
+.stage:fullscreen{width:100vw;height:100vh;border-radius:0;margin:0;display:flex;align-items:center;justify-content:center}
+.stage:fullscreen video{width:100%;height:100%;aspect-ratio:auto;object-fit:contain}
+video:fullscreen{width:100vw;height:100vh;aspect-ratio:auto;object-fit:contain;background:#000}
 .stage.audio{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,var(--pink),var(--lav))}
 .stage.audio img{width:100%;height:100%;object-fit:cover}
 .stage.audio .fall{font-size:4rem}
@@ -170,6 +174,16 @@ h1,h2,h3,.font-b{font-family:'Baloo 2',cursive}
   flex-shrink:0;font-size:.7rem;font-weight:500;color:var(--muted);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap
 }
+.lyrics-notebook{margin:4px 0 18px;background:#FFFEF7;border:1px solid #E8E1C7;border-radius:16px;overflow:hidden;box-shadow:0 3px 10px -6px rgba(23,50,77,.25)}
+.lyrics-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid #E8E1C7;color:var(--ink);font-family:'Baloo 2';font-weight:700}
+.lyrics-heading small{font:600 .7rem Quicksand,system-ui,sans-serif;color:var(--muted)}
+.lyrics-lines{max-height:230px;overflow:auto;padding:8px 14px 12px;background:repeating-linear-gradient(to bottom,#FFFEF7 0,#FFFEF7 31px,#E8EEF2 32px)}
+.lyric-line{min-height:32px;display:flex;align-items:center;gap:10px;color:#52677B;font-size:.88rem;line-height:1.4;transition:color .15s,background .15s}
+.lyric-line .lyric-time{flex:none;color:#91A0AE;font-size:.68rem;font-variant-numeric:tabular-nums}
+.lyric-line.active{color:var(--pink-d);font-weight:700;background:rgba(191,219,254,.32);border-radius:6px}
+.lyrics-empty{padding:12px 0;color:var(--muted);font-size:.8rem;line-height:1.5}
+.video-caption{position:absolute;left:8%;right:8%;bottom:54px;z-index:2;padding:8px 12px;border-radius:10px;background:rgba(0,0,0,.68);color:#fff;text-align:center;font-size:calc(clamp(.9rem,3.4vw,1.25rem)*var(--fs,1));font-weight:700;line-height:1.35;text-shadow:0 1px 2px #000;pointer-events:none}
+.video-caption:empty{display:none}
 /* modal */
 .overlay{position:fixed;inset:0;background:rgba(23,50,77,.55);display:none;align-items:flex-end;justify-content:center;z-index:20}
 .overlay.on{display:flex}
@@ -185,27 +199,53 @@ h1,h2,h3,.font-b{font-family:'Baloo 2',cursive}
 .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;
   font-size:.85rem;font-weight:600;z-index:30;opacity:0;pointer-events:none;transition:opacity .25s}
 .toast.on{opacity:1}
+
+/* ===== melhorias: letra, legenda e tela cheia ===== */
+:root{--fs:1}
+.lyrics-notebook{display:flex;flex-direction:column}
+.lyrics-heading{flex-wrap:wrap}
+.ly-tools{display:flex;gap:6px}
+.ly-tools button{border:1px solid #E8E1C7;background:#fff;color:var(--ink);border-radius:10px;min-width:40px;height:38px;font:700 .95rem Quicksand,system-ui,sans-serif;cursor:pointer}
+.ly-tools button.on{background:var(--pink-d);border-color:var(--pink-d);color:#fff}
+.lyrics-lines{position:relative;max-height:min(44vh,360px);padding:10px 12px 70px 44px;background:linear-gradient(90deg,transparent 30px,#F3B5B5 30px,#F3B5B5 32px,transparent 32px),#FFFEF7;scroll-behavior:smooth;overscroll-behavior:contain}
+.lyric-line{min-height:0;display:block;padding:7px 10px;margin:2px 0;border-radius:10px;font-size:calc(1.05rem*var(--fs));line-height:1.5;color:#52677B;opacity:.6;transition:all .2s}
+.lyric-line.past{opacity:.4}
+.lyric-line[data-t]{cursor:pointer}
+.lyric-line .lyric-time{display:inline-block;margin-right:8px;font-size:.7rem}
+.lyric-line.active{opacity:1;color:var(--ink);font-weight:700;background:#DBEAFE;font-size:calc(1.15rem*var(--fs));box-shadow:inset 4px 0 0 var(--pink-d)}
+.lyrics-notebook.big{position:fixed;inset:0;z-index:90;margin:0;border:0;border-radius:0}
+.lyrics-notebook.big .lyrics-heading{padding-top:max(12px,env(safe-area-inset-top))}
+.lyrics-notebook.big .lyrics-lines{max-height:none;flex:1}
+.lyrics-notebook.big .lyric-line{font-size:calc(1.35rem*var(--fs))}
+.lyrics-notebook.big .lyric-line.active{font-size:calc(1.55rem*var(--fs))}
+body.noscroll{overflow:hidden}
+.stage.fs .video-expand{display:none}
+.stage.pseudo{position:fixed;inset:0;z-index:100;width:100vw;height:100dvh;margin:0;border-radius:0;display:flex;align-items:center;justify-content:center;background:#000}
+.stage.fs video{width:100%;height:100%;aspect-ratio:auto;object-fit:contain}
+.vtools{position:absolute;top:0;left:0;right:0;z-index:3;display:none;gap:8px;align-items:center;padding:max(10px,env(safe-area-inset-top)) 12px 30px;background:linear-gradient(rgba(0,0,0,.65),transparent);transition:opacity .25s}
+.stage.fs .vtools{display:flex}.stage.ui-hide .vtools{opacity:0;pointer-events:none}
+.vsp{flex:1}
+.vb{border:0;border-radius:12px;min-height:44px;padding:0 14px;background:rgba(255,255,255,.94);color:var(--ink);font:700 1rem Quicksand,system-ui,sans-serif;cursor:pointer}
+.vb.off{opacity:.55}
+.stage.nocc .video-caption{display:none}
+.stage.fs .video-caption{left:5%;right:5%;bottom:90px;font-size:calc(clamp(1.1rem,3.2vw,2rem)*var(--fs))}
 </style>
 </head>
 <body>
 
 <div id="splash" class="view on">
-  <div class="note">🎵</div>
+  <div class="note"><img src="Icone%20de%20Musica.png" alt="" style="width:92px;height:92px;border-radius:24px;display:block;margin:auto" onerror="this.outerHTML='🎵'"></div>
   <h1>Minha Playlist - Offline</h1>
   <h3>Músicas (.mp3) e videoclipes (.mp4) das suas bandas favoritas</h3>
   <button id="btnEnter">Vamos começar! ✨</button>
-  <!--DL-START-->
-  <button id="btnDownload">⬇️ Baixar MinhaPlaylist.html</button>
-  <button id="btnTutorial">📖 Como instalar no celular</button>
-  <!--DL-END-->
-  		<footer style="text-align: center; color: white; font-size: 18px;"> <!-- Início do Rodapé da página -->
+  <footer style="text-align: center; color: white; font-size: 18px;"> <!-- Início do Rodapé da página -->
                   <p style="text-align: center;">
                   <a href="https://antoniopsj1-alt.github.io/Portfolio-AntonioJunior/" target="_blank" style="text-decoration: none; color: inherit;">
                    &copy; 2026 Antônio Pereira de Souza Junior.
                   </a>
                   </p>
 			<p style="text-align: center;">Todos os direitos reservados.</p>
-			<address style="text-align: center; color: blue; text-weight: bold;">
+      <address style="text-align: center; color: blue; font-weight: bold;">
 			 Contato: <a href="mailto:antoniopsj1@gmail.com">antoniopsj1@gmail.com</a>
 			</address> 
 		</footer> <!-- Fim do Rodapé -->
@@ -246,7 +286,9 @@ h1,h2,h3,.font-b{font-family:'Baloo 2',cursive}
     <div class="subhead"><div class="cov" id="bandCov"><span>🎵</span></div>
       <div><b id="bandName">—</b><br><small id="bandCount">0 itens</small></div></div>
     <button class="addfilebtn" id="btnAddFiles">＋ Adicionar arquivos</button>
+    <small style="color:var(--muted)">Na primeira importação, informe o caminho completo da banda (ex.: EVANGÉLICOS/Andre Valadão). “Adicionar arquivos” usa essa pasta como base; “Adicionar pasta” preserva as subpastas selecionadas.</small>
     <button class="addfilebtn" id="btnAddFolder">📁 Adicionar pasta (com subpastas)</button>
+    <button class="addfilebtn alt" id="btnImportSiteFolder">🌐 Importar da pasta do projeto</button>
     <ul class="tracklist" id="bandTracks"></ul>
     <div id="builderSlotBand"></div>
   </div>
@@ -266,6 +308,11 @@ h1,h2,h3,.font-b{font-family:'Baloo 2',cursive}
     <button class="tbtn" id="btnClosePlayer">✕</button></div>
   <div class="wrap">
     <div class="stage" id="stage"></div>
+    <section class="lyrics-notebook" id="lyricsNotebook" aria-label="Letra da música">
+      <div class="lyrics-heading"><span>📖 Letra da música</span><small id="lyricsFormat">TXT / LRC</small>
+        <div class="ly-tools"><button id="lyMinus" title="Diminuir letra">A−</button><button id="lyPlus" title="Aumentar letra">A+</button><button id="lyFollow" class="on" title="Acompanhar a música">🎯</button><button id="lyBig" title="Letra em tela cheia">⤢</button></div></div>
+      <div class="lyrics-lines" id="lyricsLines" aria-live="polite"></div>
+    </section>
     <div class="ttl" id="pTitle">—</div>
     <div class="tsub" id="pSub">—</div>
     <input type="range" class="seek" id="seek" value="0" min="0" max="100" step="0.1">
@@ -334,18 +381,116 @@ bands = [
 /*DATA-END*/
 
 /* ===== PERSISTÊNCIA: edições gravadas no código-fonte (name, type, cover, tracks[name,url]) ===== */
-const SESS={}, U=u=>SESS[u]||u, LSK='minhaplaylist-edicoes';
-const pick=f=>{const pt=(f.webkitRelativePath||f.name).split('/'),dir=decodeURIComponent(location.pathname).split('/').slice(-2,-1)[0];
-  if(pt.length>1&&pt[0]===dir)pt.shift(); // se escolheu a própria pasta do HTML, não repete o nome dela
-  const r=pt.join('/');SESS[r]=URL.createObjectURL(f);return r;};
+const SESS={}, LSK='minhaplaylist-edicoes';
+const U=u=>{const value=String(u||'');if(SESS[value])return SESS[value];if(/^(?:[a-z]+:|\/\/)/i.test(value))return value;return value.split('/').map(part=>encodeURIComponent(part)).join('/');};
+function relativeFilePath(file,basePath=''){
+  const hasRelativePath=Boolean(file.webkitRelativePath);
+  const parts=(file.webkitRelativePath||file.name).split('/').filter(Boolean);
+  const appPath=decodeURIComponent(new URL('.',location.href).pathname).split('/').filter(Boolean);
+  const appDir=appPath[appPath.length-1]||'';
+  if(appDir&&parts.length>1&&parts[0]===appDir)parts.shift();
+  const base=String(basePath||'').replace(/\\/g,'/').split('/').filter(Boolean);
+  const lower=(value)=>value.toLocaleLowerCase('pt-BR');
+  const alreadyBased=base.length&&base.every((part,index)=>lower(parts[index]||'')===lower(part));
+  if(base.length&&!hasRelativePath)parts.unshift(...base);
+  else if(base.length&&parts.length>1&&!alreadyBased){
+    if(lower(parts[0])===lower(base[base.length-1]))parts.splice(0,1,...base);
+    else if(lower(parts[0])!==lower(base[0]))parts.unshift(...base);
+  }
+  return parts.join('/');
+}
+function pick(file,path=relativeFilePath(file)){
+  const objectUrl=URL.createObjectURL(file);
+  SESS[path]=objectUrl;
+  SESS[relativeFilePath(file)]=objectUrl;
+  return path;
+}
+const isLyricsFile=f=>/\.(txt|lrc)$/i.test(f.name);
+const isMediaFile=(f,type)=>type==='mp3'?/\.(mp3|m4a|aac|ogg|opus|wav|flac)$/i.test(f.name):/\.(mp4|m4v|webm|ogv|mov)$/i.test(f.name);
+function rememberLyricsFiles(files,basePath=''){files.filter(isLyricsFile).forEach(file=>pick(file,relativeFilePath(file,basePath)));}
+function normalizeFolderPath(value){
+  const parts=String(value||'').replace(/\\/g,'/').split('/').filter(Boolean);
+  if(!parts.length||parts.some(part=>part==='.'||part==='..'))throw new Error('Informe uma pasta relativa válida, sem segmentos . ou ..');
+  return parts.join('/');
+}
+function askBaseFolderPath(current,name){
+  if(current){try{return normalizeFolderPath(current);}catch(error){toast(error.message);return null;}}
+  const answer=prompt('Informe o caminho completo da pasta a partir de MinhaPlaylist.html:',`EVANGÉLICOS/${name||''}`);
+  if(answer===null)return null;
+  try{return normalizeFolderPath(answer);}catch(error){toast(error.message);return null;}
+}
+async function listProjectFiles(folderPath){
+  const root=new URL('.',location.href);
+  const encodedPath=folderPath.split('/').map(part=>encodeURIComponent(part)).join('/')+'/';
+  const folderUrl=new URL(encodedPath,root);
+  if(folderUrl.origin!==location.origin||!folderUrl.pathname.startsWith(root.pathname))throw new Error('A pasta deve estar dentro do projeto local.');
+  const queue=[{url:folderUrl,depth:0}], visited=new Set(), files=[];
+  while(queue.length){
+    const current=queue.shift();
+    if(visited.has(current.url.href)||current.depth>12)continue;
+    visited.add(current.url.href);
+    const response=await fetch(current.url.href,{cache:'no-store'});
+    if(!response.ok)throw new Error(`Pasta não encontrada (${response.status}): ${folderPath}`);
+    const html=await response.text();
+    if(!/text\/html/i.test(response.headers.get('content-type')||'')||!/<title>Directory listing/i.test(html))throw new Error('O servidor não disponibiliza a listagem desta pasta.');
+    const documentListing=new DOMParser().parseFromString(html,'text/html');
+    for(const link of documentListing.querySelectorAll('a[href]')){
+      const href=link.getAttribute('href')||'';
+      if(!href||href==='../'||href==='./'||href.startsWith('?'))continue;
+      const target=new URL(href,current.url);
+      if(target.origin!==location.origin||!target.pathname.startsWith(folderUrl.pathname)||target.pathname===current.url.pathname)continue;
+      if(target.pathname.endsWith('/'))queue.push({url:target,depth:current.depth+1});
+      else files.push(target);
+    }
+    if(visited.size>1500)throw new Error('A pasta tem diretórios demais para indexar com segurança.');
+  }
+  return files;
+}
+async function scanProjectFolder(bandId,rawPath){
+  const band=bands.find(item=>item.id===bandId);
+  if(!band)return;
+  let folderPath;
+  try{folderPath=normalizeFolderPath(rawPath);}catch(error){toast(error.message);return;}
+  try{
+    const files=await listProjectFiles(folderPath);
+    const imageFiles=files.filter(file=>/\.(png|jpe?g|webp|gif|bmp|avif|svg)$/i.test(file.pathname));
+    const mediaFiles=files.filter(file=>isMediaFile({name:file.pathname},band.type));
+    const toRelative=url=>decodeURIComponent(url.pathname.slice(new URL('.',location.href).pathname.length));
+    const known=new Set(band.tracks.map(track=>decodeURIComponent(String(track.url).split(/[?#]/,1)[0])));
+    const additions=mediaFiles.filter(file=>!known.has(toRelative(file))).map(file=>({id:++uid,name:decodeURIComponent(file.pathname.split('/').pop()).replace(/\.[^/.]+$/,''),url:toRelative(file)}));
+    band.folderPath=folderPath;
+    band.tracks.push(...additions);
+    const matchingCover=imageFiles.find(file=>decodeURIComponent(file.pathname.split('/').pop()).replace(/\.[^/.]+$/,'').localeCompare(band.name,'pt-BR',{sensitivity:'base'})===0);
+    if(!band.cover&&matchingCover)band.cover=toRelative(matchingCover);
+    if(!band.cover&&imageFiles.length)band.cover=toRelative(imageFiles[0]);
+    commit();
+    if(curBandId===band.id&&$('bandView').classList.contains('on')){
+      $('bandCount').textContent=band.tracks.length+(band.type==='mp3'?' música(s)':' vídeo(s)');
+      renderBandTracks();
+    }
+    renderHome();
+    toast(`✅ ${additions.length} ${band.type==='mp3'?'música(s)':'videoclipe(s)'} e ${imageFiles.length} foto(s) localizados em ${folderPath}`);
+  }catch(error){console.error(error);toast(`Não foi possível ler ${folderPath}. Confira o caminho e se o servidor permite listar pastas.`);}
+}
 const norm=a=>JSON.stringify(a.map(b=>[b.name,b.type,b.cover||null,b.tracks.map(t=>[t.name,t.url])]));
 const SITE=!!$('btnDownload'); // no site (versão com botão Baixar) as edições não são gravadas
 const BASE=norm(bands); 
 try{const sv=SITE?null:JSON.parse(localStorage.getItem(LSK)||'null');
   if(sv&&sv.base===BASE&&Array.isArray(sv.data)){bands=sv.data;uid=Math.max(uid,...bands.flatMap(b=>[b.id,...b.tracks.map(t=>t.id)]));}
   else if(sv)localStorage.removeItem(LSK);}catch(e){}
+let pathsMigrated=false;
+bands.forEach(b=>{
+  if(!b.folderPath)return;
+  const completePath=value=>{
+    if(!value||/^(?:[a-z]+:|\/\/)/i.test(String(value)))return value;
+    return relativeFilePath({name:String(value),webkitRelativePath:String(value)},b.folderPath);
+  };
+  const cover=completePath(b.cover);
+  if(cover!==b.cover){b.cover=cover;pathsMigrated=true;}
+  b.tracks.forEach(track=>{const url=completePath(track.url);if(url!==track.url){track.url=url;pathsMigrated=true;}});
+});
 const esc=x=>JSON.stringify(x).replace(/</g,'\\u003c');
-function serialize(){return 'bands = [\n'+bands.map(b=>'  {\n    id: ++uid,\n    name: '+esc(b.name)+',\n    type: '+esc(b.type)+',\n    cover: '+esc(b.cover||null)+',\n    tracks: [\n'+b.tracks.map(t=>'      { id: ++uid, name: '+esc(t.name)+', url: '+esc(t.url)+' }').join(',\n')+'\n    ]\n  }').join(',\n')+'\n];';}
+function serialize(){return 'bands = [\n'+bands.map(b=>'  {\n    id: ++uid,\n    name: '+esc(b.name)+',\n    type: '+esc(b.type)+',\n    cover: '+esc(b.cover||null)+',\n    folderPath: '+esc(b.folderPath||null)+',\n    tracks: [\n'+b.tracks.map(t=>'      { id: ++uid, name: '+esc(t.name)+', url: '+esc(t.url)+' }').join(',\n')+'\n    ]\n  }').join(',\n')+'\n];';}
 async function fonte(){try{const r=await fetch(location.href.split('#')[0].split('?')[0],{cache:'no-store'});if(!r.ok)throw 0;return (await r.text()).replace(new RegExp('<!-- Code injected by '+'live-server -->[\\s\\S]*?<\\/scr'+'ipt>','i'),'');}catch(e){return ORIG;}}
 const comDados=t=>t.replace(/\/\*DATA-START\*\/[\s\S]*?\/\*DATA-END\*\//,()=>'/*DATA-START*/\n'+serialize()+'\n/*DATA-END*/');
 function baixar(blob,nome){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nome;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);}
@@ -361,6 +506,7 @@ if(SITE)$('btnSaveFile').style.visibility='hidden'; // no site não há o que gr
 function commit(){if(SITE)return;try{localStorage.setItem(LSK,JSON.stringify({base:BASE,data:bands}));}catch(e){}
   if(fh)gravar().catch(()=>{fh=null;}); // se já escolheu o arquivo no computador, grava direto nele (sem cópias)
 }
+if(pathsMigrated)commit();
 
 /* ===================== FIM DOS DADOS DE EXEMPLO ===================== */
 let curBandId=null, curPool=null; // 'mp3'|'mp4'
@@ -373,7 +519,9 @@ function helpHTML(){
   return `<h3>❓ Como usar</h3><ul class="help">
     <li>Toque em <b>＋ Nova banda</b> para criar uma banda e escolher se ela tem <b>músicas (MP3)</b> ou <b>videoclipes (MP4)</b>.</li>
     <li>Dentro da banda, toque em <b>Adicionar arquivos</b> para escolher os MP3 ou MP4 salvos no seu aparelho.</li>
+    <li>Para importar arquivos já existentes no projeto, informe o caminho em <b>Pasta no projeto</b> ao criar/editar a banda, por exemplo <b>EVANGÉLICOS/Andre Valadão</b>. O app percorre também as subpastas; crie uma banda MP3 e outra MP4 para importar os dois tipos da mesma pasta.</li>
     <li>Toque nas músicas ou vídeos na <b>ordem</b> que você quer ouvir/assistir — os números mostram a sequência.</li>
+    <li>Para mostrar a letra/legenda, deixe um arquivo <b>.lrc</b> ou <b>.txt</b> na mesma pasta e com o mesmo nome do MP3/MP4. Use linhas como <b>[00:12.30] trecho da letra</b> para sincronizar; texto sem horários aparece como bloco de notas.</li>
     <li>Ligue o <b>🔁 Repetir</b> se quiser que a playlist comece de novo no final.</li>
     <li>Toque em <b>Tocar playlist</b> para abrir o player com play, pausa, parar, anterior, próxima e volume.</li>
     <li>Use os botões <b>🎵 MP3</b> e <b>🎬 MP4</b> na tela inicial para misturar músicas ou vídeos de bandas diferentes.</li>
@@ -392,9 +540,12 @@ function fileToDataURL(file){return new Promise(res=>{const r=new FileReader();r
 function bandFormHTML(type){
   return `<h3>${type==='mp3'?'🎤 Nova banda · Músicas':'🎬 Nova banda · Videoclipes'}</h3>
     <label>Nome da banda</label><input type="text" id="fName" placeholder="Ex: As Estrelinhas">
+    <label>Pasta no projeto (opcional)</label><input type="text" id="fFolderPath" placeholder="Ex: EVANGÉLICOS/Andre Valadão">
+    <small style="color:var(--muted)">Informe a pasta completa a partir da pasta do MinhaPlaylist.html (ex.: EVANGÉLICOS/Andre Valadão). Ao escolher essa subpasta, o app usa esse caminho para salvar as faixas e a foto.</small>
     <label>Tipo</label><select id="fType"><option value="mp3">🎵 Músicas (mp3)</option><option value="mp4">🎬 Videoclipes (mp4)</option></select>
     <label>Foto da banda (opcional)</label>
     <label class="filepick" for="fCover">🖼️ <span id="fCoverName">Escolher uma foto</span><input type="file" id="fCover" accept="image/*"></label>
+    <small style="color:var(--muted)">Para salvar o caminho completo da foto, preencha “Pasta no projeto” antes de escolhê-la numa pasta. O seletor de uma foto avulsa não informa as pastas.</small>
     <button type="button" class="addfilebtn" id="fCoverFolder">📁 Escolher foto numa pasta (grava a subpasta)</button><div id="fCoverList"></div>
     <label>Endereço da foto (a partir da pasta do MinhaPlaylist.html)</label><input type="text" id="fCoverUrl" placeholder="Ex: Fotos/banda.png">
     <button class="save" id="fSave">Criar banda</button>`;
@@ -403,10 +554,14 @@ function wireCoverFolder(){
   $('fCoverFolder').onclick=()=>{
     const inp=document.createElement('input'); inp.type='file'; inp.multiple=true; inp.webkitdirectory=true;
     inp.onchange=()=>{
-      const im=[...inp.files].filter(f=>/\.(png|jpe?g|webp|gif)$/i.test(f.name)).sort((x,y)=>(x.webkitRelativePath||x.name).localeCompare(y.webkitRelativePath||y.name,'pt',{numeric:true}));
+      const files=[...inp.files];
+      const im=files.filter(f=>/\.(png|jpe?g|webp|gif|bmp|avif|svg)$/i.test(f.name)).sort((x,y)=>(x.webkitRelativePath||x.name).localeCompare(y.webkitRelativePath||y.name,'pt',{numeric:true}));
       if(!im.length){ toast('Nenhuma imagem nessa pasta.'); return; }
       const L=$('fCoverList'); L.innerHTML='';
-      im.slice(0,80).forEach(f=>{ const r=pick(f), bt=document.createElement('button'); bt.type='button'; bt.className='addfilebtn'; bt.textContent='🖼️ '+r;
+      const basePath=askBaseFolderPath($('fFolderPath').value.trim(),$('fName').value.trim());
+      if(!basePath)return;
+      $('fFolderPath').value=basePath;
+      im.slice(0,80).forEach(f=>{ const r=pick(f,relativeFilePath(f,basePath)), bt=document.createElement('button'); bt.type='button'; bt.className='addfilebtn'; bt.textContent='🖼️ '+r;
         bt.onclick=()=>{ $('fCoverUrl').value=r; $('fCoverName').textContent=f.name; L.innerHTML=''; }; L.appendChild(bt); });
     };
     inp.click();
@@ -416,26 +571,31 @@ function openNewBand(type){
   openModal(bandFormHTML(type));
   $('fType').value=type;
   let coverData=null;
-  $('fCover').onchange=async e=>{ if(e.target.files[0]){ coverData=pick(e.target.files[0]); $('fCoverName').textContent=e.target.files[0].name; $('fCoverUrl').value=coverData; } }; wireCoverFolder();
+  $('fCover').onchange=async e=>{ if(e.target.files[0]){ const f=e.target.files[0], base=askBaseFolderPath($('fFolderPath').value.trim(),$('fName').value.trim()); if(!base)return; $('fFolderPath').value=base; coverData=pick(f,relativeFilePath(f,base)); $('fCoverName').textContent=f.name; $('fCoverUrl').value=coverData; } }; wireCoverFolder();
   $('fSave').onclick=()=>{
     const name=$('fName').value.trim(); if(!name){ toast('Dá um nome pra banda! 🎀'); return; }
-    bands.push({id:++uid,name,type:$('fType').value,cover:$('fCoverUrl').value.trim()||coverData,tracks:[]});
+    const folderPath=$('fFolderPath').value.trim();
+    const band={id:++uid,name,type:$('fType').value,cover:$('fCoverUrl').value.trim()||coverData,folderPath:folderPath||null,tracks:[]};
+    bands.push(band);
     commit(); closeModal(); renderHome();
+    if(folderPath)scanProjectFolder(band.id,folderPath);
   };
 }
 
 function editBand(id){
   const b=bands.find(x=>x.id===id); if(!b) return;
   openModal(bandFormHTML(b.type).replace('Nova banda','Editar banda').replace('Criar banda','Salvar alterações'));
-  $('fName').value=b.name; $('fType').value=b.type;
+  $('fName').value=b.name; $('fType').value=b.type; $('fFolderPath').value=b.folderPath||'';
   let coverData=b.cover;
   $('fCoverUrl').value=b.cover&&!String(b.cover).startsWith('data:')?b.cover:'';
   if(b.cover) $('fCoverName').textContent='Foto atual (toque para trocar)';
-  $('fCover').onchange=async e=>{ if(e.target.files[0]){ coverData=pick(e.target.files[0]); $('fCoverName').textContent=e.target.files[0].name; $('fCoverUrl').value=coverData; } }; wireCoverFolder();
+  $('fCover').onchange=async e=>{ if(e.target.files[0]){ const f=e.target.files[0]; coverData=pick(f,relativeFilePath(f,$('fFolderPath').value.trim())); $('fCoverName').textContent=f.name; $('fCoverUrl').value=coverData; } }; wireCoverFolder();
   $('fSave').onclick=()=>{
     const name=$('fName').value.trim(); if(!name){ toast('Dá um nome pra banda! 🎀'); return; }
-    b.name=name; b.type=$('fType').value; const cu=$('fCoverUrl').value.trim(); b.cover=cu||(String(b.cover).startsWith('data:')?b.cover:null);
+    const folderPath=$('fFolderPath').value.trim();
+    b.name=name; b.type=$('fType').value; b.folderPath=folderPath||null; const cu=$('fCoverUrl').value.trim(); b.cover=cu||(String(b.cover).startsWith('data:')?b.cover:null);
     commit(); closeModal(); renderHome();
+    if(folderPath)scanProjectFolder(b.id,folderPath);
   };
 }
 
@@ -468,30 +628,6 @@ function renderHome(){
   document.querySelectorAll('.band [data-del]').forEach(btn=>btn.onclick=e=>{ e.stopPropagation(); deleteBand(parseInt(btn.dataset.del)); });
 }
 $('btnEnter').onclick=()=>{ show('homeView'); renderHome(); };
-/*DL-START*/
-const quitaDL=t=>t.replace(/(\/\*|<!--)DL-START(\*\/|-->)[\s\S]*?(\/\*|<!--)DL-END(\*\/|-->)\s*/g,'');
-$('btnDownload').onclick=async()=>{
-  try{
-    const r=await fetch('sw.js',{cache:'no-store'}); if(!r.ok) throw 0;
-    const sw=await r.text();
-    const html=quitaDL(await fonte());
-    baixar(new Blob([html],{type:'text/html;charset=utf-8'}),'MinhaPlaylist.html');
-    await new Promise(ok=>setTimeout(ok,700));
-    baixar(new Blob([sw],{type:'text/javascript;charset=utf-8'}),'sw.js');
-    openModal(tutorialHTML());
-  }catch(e){ toast('Não consegui baixar. Abra pelo endereço do site e tente de novo.'); }
-};
-$('btnTutorial').onclick=()=>openModal(tutorialHTML());
-function tutorialHTML(){return `<h3>📖 Instalar no celular</h3><ol class="tut">
-<li><b>Baixe os 2 arquivos:</b> toque em “Baixar MinhaPlaylist.html”. Vão para a pasta Download: <code>MinhaPlaylist.html</code> e <code>sw.js</code>. Se o celular perguntar, permita baixar vários arquivos.</li>
-<li><b>Crie a pasta Playlist:</b> no app Arquivos, dentro de Download (ou Documentos), crie a pasta <code>Playlist</code> e mova os 2 arquivos para dentro dela. Coloque ali também suas músicas (.mp3), videoclipes (.mp4) e fotos (.png). Pode organizar em subpastas dentro de Playlist (ex.: Musicas/Banda): o app grava o endereço a partir da pasta do MinhaPlaylist.html.</li>
-<li><b>Instale o Simple HTTP Server</b> (Play Store, gratuito).</li>
-<li><b>Configure:</b> abra o app, adicione a pasta <code>Playlist</code> como pasta compartilhada e permita o acesso aos arquivos. Em <b>Rede</b>, escolha todas as redes (não só Wi-Fi) e toque em <b>Reiniciar</b>.</li>
-<li><b>Abra no Chrome:</b> <code>http://localhost:8080/MinhaPlaylist.html</code>. Espere aparecer “Tudo salvo!”: depois disso ele abre mesmo sem internet e sem o servidor.</li>
-<li><b>Crie o atalho:</b> no Chrome, toque em ⋮ e em “Adicionar à tela inicial”.</li>
-<li><b>Para editar:</b> bandas e faixas editadas ficam salvas automaticamente no aparelho. Se quiser levar para outro aparelho ou ter uma cópia no código, toque em 💾 no topo da tela inicial e troque o MinhaPlaylist.html da pasta Playlist pelo baixado.</li></ol>
-<button class="save" onclick="closeModal()">Entendi! 💗</button>`;}
-/*DL-END*/
 $('btnAllMp3').onclick=()=>openPool('mp3');
 $('btnAllMp4').onclick=()=>openPool('mp4');
 
@@ -506,12 +642,25 @@ function openBand(id){
   show('bandView');
 }
 $('btnBackBand').onclick=()=>show('homeView');
+$('btnImportSiteFolder').onclick=()=>{
+  const band=bands.find(item=>item.id===curBandId);
+  if(!band)return;
+  const folderPath=prompt('Caminho relativo da pasta no projeto:',band.folderPath||`EVANGÉLICOS/${band.name}`);
+  if(folderPath!==null)scanProjectFolder(band.id,folderPath);
+};
 $('btnAddFiles').onclick=()=>{
   const b=bands.find(x=>x.id===curBandId);
   const inp=document.createElement('input'); inp.type='file'; inp.multiple=true;
-  inp.accept=b.type==='mp3'?'audio/*,.mp3':'video/*,.mp4';
+  inp.accept=b.type==='mp3'?'audio/*,.mp3,.txt,.lrc':'video/*,.mp4,.txt,.lrc';
   inp.onchange=()=>{
-    [...inp.files].forEach(f=>b.tracks.push({id:++uid,name:f.name.replace(/\.[^/.]+$/,''),url:pick(f)}));
+    const files=[...inp.files];
+    const media=files.filter(f=>isMediaFile(f,b.type));
+    if(!media.length){toast('Selecione arquivos de mídia MP3 ou MP4.');return;}
+    const basePath=askBaseFolderPath(b.folderPath,b.name);
+    if(!basePath)return;
+    b.folderPath=basePath;
+    rememberLyricsFiles(files,basePath);
+    media.forEach(f=>b.tracks.push({id:++uid,name:f.name.replace(/\.[^/.]+$/,''),url:pick(f,relativeFilePath(f,basePath))}));
     commit();
     $('bandCount').textContent=b.tracks.length+(b.type==='mp3'?' música(s)':' vídeo(s)');
     renderBandTracks();
@@ -519,12 +668,17 @@ $('btnAddFiles').onclick=()=>{
   inp.click();
 };
 $('btnAddFolder').onclick=()=>{
-  const b=bands.find(x=>x.id===curBandId),ext=b.type==='mp3'?/\.mp3$/i:/\.mp4$/i;
+  const b=bands.find(x=>x.id===curBandId);
   const inp=document.createElement('input'); inp.type='file'; inp.multiple=true; inp.webkitdirectory=true;
   inp.onchange=()=>{
-    const fs=[...inp.files].filter(f=>ext.test(f.name)).sort((x,y)=>(x.webkitRelativePath||x.name).localeCompare(y.webkitRelativePath||y.name,'pt',{numeric:true}));
-    if(!fs.length){ toast('Nenhum arquivo .'+b.type+' nessa pasta.'); return; }
-    fs.forEach(f=>b.tracks.push({id:++uid,name:f.name.replace(/\.[^/.]+$/,''),url:pick(f)}));
+    const files=[...inp.files];
+    const fs=files.filter(f=>isMediaFile(f,b.type)).sort((x,y)=>(x.webkitRelativePath||x.name).localeCompare(y.webkitRelativePath||y.name,'pt',{numeric:true}));
+    if(!fs.length){ toast('Nenhum arquivo de mídia compatível nessa pasta.'); return; }
+    const basePath=askBaseFolderPath(b.folderPath,b.name);
+    if(!basePath)return;
+    b.folderPath=basePath;
+    rememberLyricsFiles(files,basePath);
+    fs.forEach(f=>b.tracks.push({id:++uid,name:f.name.replace(/\.[^/.]+$/,''),url:pick(f,relativeFilePath(f,basePath))}));
     commit(); toast('📁 '+fs.length+' arquivo(s). Ex.: '+b.tracks[b.tracks.length-1].url);
     $('bandCount').textContent=b.tracks.length+(b.type==='mp3'?' música(s)':' vídeo(s)');
     renderBandTracks();
@@ -647,16 +801,118 @@ function renderBuilder(slotId,type,getItems){
 }
 
 /* ---------- Player ---------- */
-const audioEl=$('audioEl'); let videoEl=null;
+const audioEl=$('audioEl'); let videoEl=null, lyricRequest=0, currentLyrics=[];
 function fmt(s){ if(!isFinite(s))return '0:00'; const m=Math.floor(s/60),r=Math.floor(s%60); return m+':'+String(r).padStart(2,'0'); }
+function parseLyrics(text){
+  const rows=[]; let offset=0;
+  const clean=String(text).replace(/^\uFEFF/,'').replace(/\r/g,'');
+  const offsetTag=clean.match(/^\[offset:([+-]?\d+)\]/im);
+  if(offsetTag) offset=Number(offsetTag[1])/1000;
+  for(const raw of clean.split('\n')){
+    if(/^\[(ar|al|ti|au|by|re|ve|length|offset):/i.test(raw.trim())) continue;
+    const times=[...raw.matchAll(/\[(\d{1,2}):(\d{2})(?:[.:](\d{1,3}))?\]/g)];
+    const textLine=raw.replace(/\[\d{1,2}:\d{2}(?:[.:]\d{1,3})?\]/g,'').trim();
+    if(!textLine) continue;
+    if(times.length){
+      for(const match of times){
+        const fraction=match[3]?Number(`0.${match[3]}`):0;
+        rows.push({time:Math.max(0,Number(match[1])*60+Number(match[2])+fraction+offset),text:textLine});
+      }
+    }else rows.push({time:null,text:textLine});
+  }
+  rows.sort((a,b)=>a.time===null?1:b.time===null?-1:a.time-b.time);
+  return rows;
+}
+function renderLyrics(rows,format){
+  const panel=$('lyricsNotebook'), container=$('lyricsLines');
+  container.replaceChildren();
+  if(!rows.length){
+    const hint=document.createElement('div'); hint.className='lyrics-empty';
+    hint.textContent='Letra não encontrada. Coloque um arquivo .txt ou .lrc com o mesmo nome da música/vídeo na mesma pasta.';
+    container.append(hint); $('lyricsFormat').textContent='TXT / LRC'; panel.hidden=false; return;
+  }
+  $('lyricsFormat').textContent=format==='lrc'?'Sincronizada · LRC':'Texto · TXT';
+  for(const [index,row] of rows.entries()){
+    const line=document.createElement('div'); line.className='lyric-line'; line.dataset.index=String(index);
+    if(row.time!==null){const time=document.createElement('span');time.className='lyric-time';time.textContent=fmt(row.time);line.append(time);}
+    const text=document.createElement('span');text.textContent=row.text;line.append(text);container.append(line);
+    if(row.time!==null){line.dataset.t=row.time;line.onclick=()=>{const el=curEl();if(el)el.currentTime=row.time;};}
+  }
+  panel.hidden=false;
+}
+async function loadLyrics(track){
+  const requestId=++lyricRequest;
+  currentLyrics=[];
+  const caption=$('videoCaption'); if(caption) caption.textContent='';
+  const path=String(track.url||'').split(/[?#]/,1)[0];
+  const base=/^(blob:|data:)/i.test(path)?null:path.replace(/\.[^/.]+$/,'');
+  if(!base){renderLyrics([]);return;}
+  for(const ext of ['.lrc','.txt']){
+    try{
+      const expected=base+ext;
+      const selectedPath=Object.keys(SESS).find(saved=>saved.toLocaleLowerCase('pt-BR')===expected.toLocaleLowerCase('pt-BR'));
+      const candidate=track.lyricsUrl||selectedPath||expected;
+      const url=U(candidate);
+      const response=await fetch(url);
+      if(!response.ok) continue;
+      const contentType=response.headers.get('content-type')||'';
+      if(/text\/html/i.test(contentType)) continue;
+      const rows=parseLyrics(await response.text());
+      if(requestId!==lyricRequest)return;
+      if(rows.length){currentLyrics=rows;renderLyrics(rows,ext==='.lrc'?'lrc':'txt');updateLyrics(curEl()?.currentTime||0);return;}
+    }catch(error){/* A sidecar can be absent; try the next supported extension. */}
+  }
+  if(requestId===lyricRequest)renderLyrics([]);
+}
+function updateLyrics(seconds){
+  const timed=currentLyrics.filter(line=>line.time!==null);
+  let active=-1;
+  for(let i=0;i<timed.length;i++){if(timed[i].time<=seconds)active=currentLyrics.indexOf(timed[i]);else break;}
+  const lines=$('lyricsLines').querySelectorAll('.lyric-line');
+  lines.forEach((line,index)=>{line.classList.toggle('active',index===active);line.classList.toggle('past',active>=0&&index<active);});
+  const caption=$('videoCaption');
+  if(caption)caption.textContent=active>=0?currentLyrics[active].text:'';
+  if(active>=0&&follow){const L=lines[active],c=$('lyricsLines');if(L)c.scrollTo({top:L.offsetTop-c.clientHeight/2+L.clientHeight/2,behavior:'smooth'});}
+}
 function startPlayer(list,type){
   playlist=list; playType=type; curIdx=0;
-  $('stage').className='stage'+(type==='mp3'?' audio':'');
-  if(type==='mp4'){ $('stage').innerHTML='<video id="videoEl" playsinline></video>'; videoEl=$('videoEl'); }
+  $('stage').className='stage'+(type==='mp3'?' audio':' video-stage');
+  if(type==='mp4'){ $('stage').innerHTML='<video id="videoEl" playsinline controlslist="nofullscreen noremoteplayback" disablepictureinpicture></video><div class="vtools" id="vtools"><button class="vb" id="vExit" type="button">✕ Tamanho normal</button><span class="vsp"></span><button class="vb" id="vCC" type="button" title="Mostrar/ocultar legenda">CC</button><button class="vb" id="vMinus" type="button">A−</button><button class="vb" id="vPlus" type="button">A+</button></div><div class="video-caption" id="videoCaption" aria-live="polite"></div><button class="video-expand" id="btnExpandVideo" type="button" aria-label="Expandir videoclipe" title="Expandir videoclipe">⛶</button>'; videoEl=$('videoEl'); }
   else{ $('stage').innerHTML='<div class="fall">🎵</div>'; videoEl=null; }
+  if(type==='mp4'){$('btnExpandVideo').onclick=expandVideo;$('vExit').onclick=()=>setFs(false);$('vMinus').onclick=()=>setScale(-.1);$('vPlus').onclick=()=>setScale(.1);$('vCC').onclick=e=>e.currentTarget.classList.toggle('off',$('stage').classList.toggle('nocc'));}
   renderPlList(); loadTrack(0); show('playerView');
 }
-$('btnBackPlayer').onclick=()=>{ pauseCur(); show(curBandId?'bandView':'poolView'); };
+let FS=parseFloat(localStorage.getItem('pl-fs'))||1,follow=true,stageUi=null;
+function setScale(d){FS=Math.min(1.8,Math.max(.8,+(FS+d).toFixed(2)));document.documentElement.style.setProperty('--fs',FS);try{localStorage.setItem('pl-fs',FS)}catch(e){}}
+document.documentElement.style.setProperty('--fs',FS);
+function syncScroll(){document.body.classList.toggle('noscroll',!!document.querySelector('.lyrics-notebook.big,.stage.pseudo'));}
+$('lyMinus').onclick=()=>setScale(-.1);$('lyPlus').onclick=()=>setScale(.1);
+$('lyFollow').onclick=e=>{follow=!follow;e.currentTarget.classList.toggle('on',follow);toast(follow?'A letra acompanha a música':'Rolagem livre da letra');};
+$('lyBig').onclick=e=>{const b=$('lyricsNotebook').classList.toggle('big');e.currentTarget.textContent=b?'✕':'⤢';syncScroll();};
+const inFs=()=>{const s=$('stage');return document.fullscreenElement===s||document.webkitFullscreenElement===s||s.classList.contains('pseudo');};
+function showUi(){const s=$('stage');s.classList.remove('ui-hide');clearTimeout(stageUi);if(s.classList.contains('fs'))stageUi=setTimeout(()=>{if(videoEl&&!videoEl.paused)s.classList.add('ui-hide');},3000);}
+async function setFs(on){
+  const s=$('stage'); if(!videoEl) return;
+  if(on){
+    videoEl.controls=true;
+    const rq=s.requestFullscreen||s.webkitRequestFullscreen;
+    try{ if(!rq) throw 0; await rq.call(s); }catch(e){ s.classList.add('pseudo'); }
+    s.classList.add('fs'); showUi();
+    try{ if(videoEl.videoWidth>=videoEl.videoHeight) await screen.orientation.lock('landscape'); }catch(e){}
+  }else{
+    try{ if(document.fullscreenElement) await document.exitFullscreen(); else if(document.webkitFullscreenElement) document.webkitExitFullscreen(); }catch(e){}
+    s.classList.remove('pseudo','fs','ui-hide'); videoEl.controls=false;
+    try{ screen.orientation.unlock(); }catch(e){}
+  }
+  syncScroll();
+}
+const expandVideo=()=>setFs(!inFs());
+const onFsChange=()=>{ if(videoEl&&!document.fullscreenElement&&!document.webkitFullscreenElement&&!$('stage').classList.contains('pseudo')) setFs(false); };
+document.addEventListener('fullscreenchange',onFsChange);document.addEventListener('webkitfullscreenchange',onFsChange);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if($('stage').classList.contains('pseudo')) setFs(false); if($('lyricsNotebook').classList.contains('big')) $('lyBig').click(); } });
+['pointermove','click','touchstart'].forEach(ev=>$('stage').addEventListener(ev,()=>{ if($('stage').classList.contains('fs')) showUi(); }));
+$('stage').addEventListener('dblclick',e=>{ if(e.target===videoEl) expandVideo(); });
+$('btnBackPlayer').onclick=()=>{ if(videoEl&&inFs()) setFs(false); pauseCur(); show(curBandId?'bandView':'poolView'); };
 /* filepath: c:\Users\Antônio Jr\Documents\Programas HTML com VS Code\10 - Aplicativo Minha Playlist - ANASTASIA\BACKUP PLAYLIST VAZIA\MinhaPlaylist.html */
 function renderPlList(){
   const list=$('plList');
@@ -699,6 +955,7 @@ function loadTrack(i){
   if(i<0||i>=playlist.length) return;
   pauseCur(); curIdx=i; const t=playlist[i];
   $('pTitle').textContent=t.name; $('pSub').textContent=t.bandName||'';
+  loadLyrics(t);
   const el=curEl(); el.src=U(t.url); el.volume=$('volSlider').value/100; el.play().catch(()=>{});
   $('btnPlay').textContent='⏸';
   renderPlList();
@@ -714,7 +971,7 @@ $('seek').addEventListener('input',e=>{ const el=curEl(); if(el&&el.duration) el
 [audioEl].forEach(el=>bindMedia(el));
 function bindMedia(el){
   el.addEventListener('timeupdate',()=>{ if(curEl()!==el||!el.duration) return;
-    $('seek').value=(el.currentTime/el.duration)*100; $('tcur').textContent=fmt(el.currentTime); $('tdur').textContent=fmt(el.duration); });
+    $('seek').value=(el.currentTime/el.duration)*100; $('tcur').textContent=fmt(el.currentTime); $('tdur').textContent=fmt(el.duration); updateLyrics(el.currentTime); });
   el.addEventListener('ended',()=>{ if(curEl()===el) next(); });
 }
 document.addEventListener('touchmove',e=>{ if(e.target.closest('.seek')||e.target.closest('#volSlider')) e.preventDefault(); },{passive:false});
@@ -723,7 +980,7 @@ loadTrack=function(i){ origLoadTrack(i); if(playType==='mp4'&&videoEl&&!videoEl.
 
 /* ===== MODO OFFLINE: salva tudo no tablet (Service Worker + Cache) ===== */
 (function(){
-  if(!('serviceWorker' in navigator) || !window.isSecureContext || !window.caches) return;
+  if(!/^https?:$/.test(location.protocol) || !('serviceWorker' in navigator) || !window.isSecureContext || !window.caches) return;
   const badge=document.createElement('div');
   badge.style.cssText='position:fixed;left:50%;bottom:12px;transform:translateX(-50%);background:#222;color:#fff;padding:6px 14px;border-radius:20px;font:600 13px sans-serif;z-index:9999;display:none;opacity:.92;max-width:90vw;text-align:center';
   document.body.appendChild(badge);
