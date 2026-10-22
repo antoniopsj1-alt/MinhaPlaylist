@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Minha Playlist - Baixar e usar offline</title>
+<link rel="icon" type="image/png" href="Icone%20de%20Musica.png"><link rel="apple-touch-icon" href="Icone%20de%20Musica.png">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--pr:#2563EB;--ink:#17324D;--mu:#66809A;--bd:#D5E5F5}
+*{box-sizing:border-box}body{margin:0;font:16px/1.6 Quicksand,system-ui,sans-serif;color:var(--ink);background:linear-gradient(160deg,#EAF4FF,#DCEBFF);min-height:100vh}
+.w{max-width:760px;margin:0 auto;padding:28px 16px}.hero{text-align:center}.hero img{width:110px;height:110px;border-radius:28px;box-shadow:0 10px 24px -10px rgba(37,99,235,.5)}
+h1{font:800 1.9rem 'Baloo 2',system-ui;margin:10px 0 2px}.hero p{color:var(--mu);margin:0 0 14px}
+.card{background:#fff;border:1px solid var(--bd);border-radius:18px;padding:18px;margin-top:14px;box-shadow:0 4px 14px rgba(37,99,235,.08)}h2{margin:0 0 8px;font:700 1.15rem 'Baloo 2',system-ui}
+.b{display:inline-block;border:0;border-radius:14px;background:var(--pr);color:#fff;padding:13px 20px;font:700 1rem Quicksand,system-ui;cursor:pointer;text-decoration:none;margin:6px 6px 0 0}.b.s{background:#EAF2FF;color:var(--pr);border:1px solid var(--bd)}
+.mu{color:var(--mu);font-size:.88rem}code{background:#EAF2FF;padding:1px 6px;border-radius:6px}ol{padding-left:20px;margin:6px 0}
+.app-footer{background:#eaf2ff;color:#0b1b3a;border-top:1px solid #cfe0ff;padding:16px;margin-top:24px;font-size:.92rem}.app-footer p,.app-footer address{margin:3px 0}
+</style></head><body>
+<div class="w">
+<div class="hero"><img src="Icone%20de%20Musica.png" alt="Ícone de música"><h1>Minha Playlist</h1><p>Suas músicas (.mp3) e videoclipes (.mp4) com letra, direto no celular, tablet ou computador.</p>
+<a class="b" href="MinhaPlaylist.html">▶ Abrir a playlist</a><button class="b s" id="bz" onclick="baixarZip()">⬇️ Baixar para usar offline (.zip)</button></div>
+<p class="mu" id="sz" style="text-align:center"></p>
+<div class="card"><h2>📦 O que vem no pacote</h2><p>MinhaPlaylist.html (o aplicativo), sw.js (guarda tudo para funcionar sem internet), Icone de Musica.png e um LEIA-ME. <button class="b s" onclick="baixarSep()" style="padding:8px 14px;font-size:.9rem">Baixar os 3 arquivos separados</button></p></div>
+<div class="card"><h2>📱 Instalar no celular ou tablet</h2><ol>
+<li>Baixe o .zip e, no app <b>Arquivos</b>, toque nele e escolha <b>Extrair</b> (por exemplo, para <code>Download/Playlist</code>).</li>
+<li>Coloque na mesma pasta as pastas das bandas com os <b>.mp3</b> e <b>.mp4</b>. Para a letra, deixe um <b>.lrc</b> ou <b>.txt</b> com o mesmo nome da música.</li>
+<li>Abra um servidor local apontando para essa pasta (por exemplo, um app de servidor HTTP na porta 8080) e acesse <code>http://localhost:8080/MinhaPlaylist.html</code> no <b>Chrome</b>.</li>
+<li>Menu <b>⋮</b> → <b>Adicionar à tela inicial</b>. Depois de abrir uma vez com o servidor ligado, o app guarda o que precisa para funcionar offline.</li></ol>
+<p class="mu">Também dá para abrir o MinhaPlaylist.html direto pelo Arquivos com o Chrome, mas o modo offline automático (sw.js) só age quando aberto por um endereço (localhost ou https).</p></div>
+<div class="card"><h2>💻 Instalar no computador</h2><ol>
+<li>Extraia o .zip em uma pasta e coloque nela as pastas das bandas.</li>
+<li>No terminal, dentro da pasta, rode <code>python -m http.server 8080</code> (ou use o Live Server do VS Code).</li>
+<li>Acesse <code>http://localhost:8080/MinhaPlaylist.html</code> no Chrome ou Edge e clique no ícone de instalar na barra de endereço.</li></ol></div>
+<div class="card"><h2>💡 Dicas</h2><ul><li>Use Chrome ou Edge atualizados. Limpar os dados do navegador apaga o modo offline.</li><li>Na tela do vídeo, use ⛶ para ampliar e <b>✕ Tamanho normal</b> para voltar; toque duas vezes no vídeo também alterna.</li><li>Na letra, use A−/A+ para o tamanho do texto, 🎯 para seguir a música e ⤢ para ler em tela cheia.</li></ul></div>
+</div>
+<footer class="app-footer"> <!-- Início do Rodapé da página -->
+                  <p style="text-align: center;">
+                  <a href="https://antoniopsj1-alt.github.io/Portfolio-AntonioJunior/" target="_blank" style="text-decoration: none; color: inherit;">
+                   &copy; 2026 Antônio Pereira de Souza Junior.
+                  </a>
+                  </p>
+			<p style="text-align: center;">Todos os direitos reservados.</p>
+      <address style="text-align: center; color: blue; font-weight: bold;">
+			 Contato: <a href="mailto:antoniopsj1@gmail.com">antoniopsj1@gmail.com</a>
+			</address> 
+		</footer> <!-- Fim do Rodapé -->
+<script>
+const $=i=>document.getElementById(i),sleep=m=>new Promise(r=>setTimeout(r,m));
+const LEIA='MINHA PLAYLIST - USO OFFLINE\r\n\r\n1) Extraia o zip em uma pasta (ex.: Download/Playlist).\r\n2) Coloque nela as pastas das bandas com .mp3/.mp4 e as letras .lrc/.txt (mesmo nome da musica).\r\n3) Abra um servidor local na pasta (porta 8080) e acesse http://localhost:8080/MinhaPlaylist.html no Chrome.\r\n   No PC: python -m http.server 8080\r\n4) Menu do Chrome > Adicionar a tela inicial / Instalar app. Depois de abrir uma vez, funciona offline.\r\n';
+function crc32(u){const t=crc32.t||(crc32.t=Array.from({length:256},(_,n)=>{let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;return c>>>0}));let r=-1;for(const b of u)r=t[(r^b)&255]^(r>>>8);return(r^-1)>>>0}
+function zip(fs){const en=new TextEncoder(),P=[],C=[];let off=0;
+ for(const f of fs){const nm=en.encode(f.n),crc=crc32(f.d),h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x800,true);h.setUint32(14,crc,true);h.setUint32(18,f.d.length,true);h.setUint32(22,f.d.length,true);h.setUint16(26,nm.length,true);P.push(h.buffer,nm,f.d);
+  const c=new DataView(new ArrayBuffer(46));c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x800,true);c.setUint32(16,crc,true);c.setUint32(20,f.d.length,true);c.setUint32(24,f.d.length,true);c.setUint16(28,nm.length,true);c.setUint32(42,off,true);C.push(c.buffer,nm);off+=30+nm.length+f.d.length}
+ let cs=0;for(const x of C)cs+=x.byteLength||x.length;const e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,fs.length,true);e.setUint16(10,fs.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+ return new Blob([...P,...C,e.buffer],{type:'application/zip'})}
+function salvar(b,n){const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;document.body.appendChild(a);a.click();a.remove()}
+const pega=async n=>{const r=await fetch('./'+n,{cache:'no-store'});if(!r.ok)throw new Error(n+' ('+r.status+')');return r.blob()};
+const ARQ=['MinhaPlaylist.html','sw.js','Icone%20de%20Musica.png'],NOME=n=>decodeURIComponent(n);
+async function baixarZip(){const s=$('sz');try{s.textContent='Montando o pacote...';const d=[];for(const n of ARQ)d.push({n:'MinhaPlaylist/'+NOME(n),d:new Uint8Array(await(await pega(n)).arrayBuffer())});
+ d.push({n:'MinhaPlaylist/LEIA-ME.txt',d:new TextEncoder().encode(LEIA)});salvar(zip(d),'MinhaPlaylist.zip');s.textContent='Pronto! Extraia o .zip e siga o tutorial abaixo.'}catch(e){s.textContent='Não foi possível baixar daqui: '+e.message}}
+async function baixarSep(){const s=$('sz');try{for(const n of ARQ){salvar(await pega(n),NOME(n));await sleep(800)}s.textContent='Baixado! Deixe os arquivos na mesma pasta.'}catch(e){s.textContent='Não foi possível baixar daqui: '+e.message}}
+if('serviceWorker'in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script></body></html>
